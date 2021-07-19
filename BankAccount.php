@@ -1,6 +1,6 @@
 <?php
 
-class BankAccount
+class BankAccount //implements JsonSerializable
 {
     private $name;
     private $accountNumber;
@@ -68,4 +68,14 @@ class BankAccount
         $this->isOpen = $isOpen;
         return $this;
     }
+
+    // public function jsonSerialize() {
+    //     return [
+    //         $this->getName(),
+    //         $this->getAccountNumber(),
+    //         $this->getBalance(),
+    //         $this->getType(),
+    //         $this->getIsOpen()
+    //     ];
+    // }
 }

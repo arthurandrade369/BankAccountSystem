@@ -6,6 +6,9 @@ if (!empty($_POST['name']) && !empty($_POST['type']) && isset($_REQUEST['send'])
     $controller = new BankAccountController();
     $bank = $controller->openAccount($_POST["name"], $_POST['type']);
 }
+if (!empty($_POST['deposit']) && isset($_REQUEST['send'])) {
+    $controller->cashDeposit($bank, $_POST["deposit"]);
+}
 ?>
 <html>
 <title>Criação de conta</title>
@@ -22,6 +25,11 @@ if (!empty($_POST['name']) && !empty($_POST['type']) && isset($_REQUEST['send'])
             <option value="CP">Conta Poupança</option>
         </select><br>
 
+        <input type="submit" name="send">
+    </form>
+    <form method="POST">
+        <label>Deposito:</label>
+        <input type="text" name="deposit"><br>
         <input type="submit" name="send">
     </form>
 
