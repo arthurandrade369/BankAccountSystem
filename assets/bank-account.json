@@ -1,7 +1,0 @@
-{
-    "\u0000BankAccount\u0000name": "teste",
-    "\u0000BankAccount\u0000accountNumber": 2021405,
-    "\u0000BankAccount\u0000type": "CC",
-    "\u0000BankAccount\u0000balance": 50,
-    "\u0000BankAccount\u0000isOpen": true
-}
