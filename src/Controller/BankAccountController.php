@@ -1,5 +1,6 @@
 <?php
-require_once("BankAccount.php");
+require_once("../Entity/BankAccount.php");
+require_once("./config/connection-db.php");;
 
 class BankAccountController
 {
@@ -20,27 +21,29 @@ class BankAccountController
 
         $bankAccount->setIsOpen(true);
 
-        $url = 'assets/bank-account.json';
-
-        $array = [];
         
-        $json = fopen($url, 'r');
-        fclose($json);
-        
-        if ($json) {
-            $json = file_get_contents($url);
-            $array[] = json_decode($json);
-            echo $array . "<br>";
-            array_push($array, $json);
-            echo $array . "<br>";
-        }
-        $array = (array) $bankAccount;
-        $array = json_encode($array, JSON_PRETTY_PRINT);
-        // echo $array . "<br>";
 
-        $fp = fopen($url, 'a+') or die("Nao foi possivel abrir o arquivo!");
-        fwrite($fp, $array);
-        fclose($fp);
+        // $url = 'assets/bank-account.json';
+
+        // $array = [];
+        
+        // $json = fopen($url, 'r');
+        // fclose($json);
+        
+        // if ($json) {
+        //     $json = file_get_contents($url);
+        //     $array[] = json_decode($json);
+        //     echo $array . "<br>";
+        //     array_push($array, $json);
+        //     echo $array . "<br>";
+        // }
+        // $array = (array) $bankAccount;
+        // $array = json_encode($array, JSON_PRETTY_PRINT);
+        // // echo $array . "<br>";
+
+        // $fp = fopen($url, 'a+') or die("Nao foi possivel abrir o arquivo!");
+        // fwrite($fp, $array);
+        // fclose($fp);
 
         return $bankAccount;
     }

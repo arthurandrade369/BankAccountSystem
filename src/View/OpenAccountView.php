@@ -1,6 +1,6 @@
 <?php
 
-require_once("./BankAccountController.php");
+require_once("../Controller/BankAccountController.php");
 
 if (!empty($_POST['name']) && !empty($_POST['type']) && isset($_REQUEST['send'])) {
     $controller = new BankAccountController();
