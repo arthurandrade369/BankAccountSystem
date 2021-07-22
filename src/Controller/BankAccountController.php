@@ -1,9 +1,15 @@
 <?php
 require_once("../Entity/BankAccount.php");
-require_once("C:\Users/Dinopc/Desktop/OqueVoceProcura/DEV/PHP/BankAccountSystem/config/connection-db.php");
+require_once("../../config/connection-db.php");
 
 class BankAccountController
 {
+    private $pdo;
+
+    public function __construct($pdo)
+    {
+        $this->pdo = $pdo;
+    }
     public function openAccount($name, $type)
     {
         if (empty($name) || empty($type)) return;
@@ -11,15 +17,24 @@ class BankAccountController
         $bankAccount->setName($name);
         $bankAccount->setType($type);
         // $bankAccount->setAccountNumber(date("Y") . intval(mt_rand(001, 999)));
-
         $bankAccount->setName($_POST["name"]);
         if ($bankAccount->getType() === "CC") {
             $bankAccount->setBalance(50.00);
         } else if ($bankAccount->getType() === "CP") {
             $bankAccount->setBalance(150.00);
         }
-
         $bankAccount->setIsOpen(true);
+
+        $balance = $bankAccount->getBalance();
+        $isOpen = $bankAccount->getIsOpen();
+
+        try {
+            $sql = "INSERT INTO account VALUES (DEFAULT, '$name', '$type', '$balance', '$isOpen')";
+            $this->pdo->exec($sql);
+            echo "Cadastrado com successo!";
+        } catch (PDOException $e) {
+            echo $sql . "<br>" . $e;
+        }
 
         // $url = 'assets/bank-account.json';
 
@@ -44,6 +59,24 @@ class BankAccountController
         // fclose($fp);
 
         return $bankAccount;
+    }
+
+    public function showAccount($accountNumber)
+    {
+        try {
+            $sql = "SELECT * FROM account WHERE accountnumber = '$accountNumber'";
+            $aws = $this->pdo->prepare($sql);
+            if ($aws->execute()) {
+                while ($rs = $aws->fetch(PDO::FETCH_OBJ)) {
+                    echo $rs->accountnumber . $rs->name . $rs->type
+                        .$rs->balance . $rs->isopen;
+                }
+            } else {
+                echo "Erro: Não foi possível recuperar os dados do banco de dados";
+            }
+        } catch (PDOException $e) {
+            echo $sql . "<br>" . $e;
+        }
     }
 
     public function cashDeposit($accountNumber, $value)
