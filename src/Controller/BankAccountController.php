@@ -1,6 +1,6 @@
 <?php
 require_once("../Entity/BankAccount.php");
-require_once("./config/connection-db.php");;
+require_once("C:\Users/Dinopc/Desktop/OqueVoceProcura/DEV/PHP/BankAccountSystem/config/connection-db.php");
 
 class BankAccountController
 {
@@ -10,7 +10,7 @@ class BankAccountController
         $bankAccount = new BankAccount();
         $bankAccount->setName($name);
         $bankAccount->setType($type);
-        $bankAccount->setAccountNumber(date("Y") . intval(mt_rand(001, 999)));
+        // $bankAccount->setAccountNumber(date("Y") . intval(mt_rand(001, 999)));
 
         $bankAccount->setName($_POST["name"]);
         if ($bankAccount->getType() === "CC") {
@@ -21,15 +21,13 @@ class BankAccountController
 
         $bankAccount->setIsOpen(true);
 
-        
-
         // $url = 'assets/bank-account.json';
 
         // $array = [];
-        
+
         // $json = fopen($url, 'r');
         // fclose($json);
-        
+
         // if ($json) {
         //     $json = file_get_contents($url);
         //     $array[] = json_decode($json);
@@ -74,7 +72,7 @@ class BankAccountController
 
     public function montlyPayment($bankAccount)
     {
-        if($bankAccount->getType()=="CC"){
+        if ($bankAccount->getType() == "CC") {
             $bankAccount->setBalance();
         }
     }

@@ -6,7 +6,7 @@
 
 <body>
 
-    <form action="BankAccountSystem/OpenAccount.php">
+    <form action="../src/View/OpenAccountView.php">
         <input type="submit" value="Abrir Conta">
     </form>
 

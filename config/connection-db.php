@@ -1,7 +1,7 @@
 <?php
 
 define('local', 'localhost');
-define('bd', 'teste');
+define('bd', 'bank');
 define('usuario', 'root');
 define('senha', '12345');
 define('DB_CHARSET', 'utf8_general_ci');
