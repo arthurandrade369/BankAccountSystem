@@ -16,7 +16,7 @@ class BankAccountController
         $bankAccount = new BankAccount();
         $bankAccount->setName($name);
         $bankAccount->setType($type);
-        // $bankAccount->setAccountNumber(date("Y") . intval(mt_rand(001, 999)));
+        $bankAccount->setAccountNumber(intval(mt_rand(1000, 9999)));
         $bankAccount->setName($_POST["name"]);
         if ($bankAccount->getType() === "CC") {
             $bankAccount->setBalance(50.00);
@@ -25,44 +25,24 @@ class BankAccountController
         }
         $bankAccount->setIsOpen(true);
 
+        $accountNumber = $bankAccount->getAccountNumber();
         $balance = $bankAccount->getBalance();
         $isOpen = $bankAccount->getIsOpen();
 
         try {
-            $sql = "INSERT INTO account (name,type,balance,isopen) VALUES ('$name', '$type','$balance', '$isOpen')";
-            $p_sql = Connection::getInstance();
-            $p_sql->exec($sql);
-            // $p_sql->bindValue(":name", $name);
-            // $p_sql->bindValue(":type", $type);
-            // $p_sql->bindValue(":balance", $balance);
-            // $p_sql->bindValue(":isOpen", $isOpen);
-
-            echo "Cadastrado com successo!";
+            $sql = "INSERT INTO account VALUES (:account, :name, :type,:balance, :isOpen)";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->bindValue(":name", $name);
+            $p_sql->bindValue(":type", $type);
+            $p_sql->bindValue(":balance", $balance);
+            $p_sql->bindValue(":isOpen", $isOpen);
+            $p_sql->execute();
+            echo "Cadastrado com successo!<br>";
+            echo "Sua conta é: " . $accountNumber . "!<br>";
         } catch (PDOException $e) {
             echo $sql . "<br>" . $e;
         }
-
-        // $url = 'assets/bank-account.json';
-
-        // $array = [];
-
-        // $json = fopen($url, 'r');
-        // fclose($json);
-
-        // if ($json) {
-        //     $json = file_get_contents($url);
-        //     $array[] = json_decode($json);
-        //     echo $array . "<br>";
-        //     array_push($array, $json);
-        //     echo $array . "<br>";
-        // }
-        // $array = (array) $bankAccount;
-        // $array = json_encode($array, JSON_PRETTY_PRINT);
-        // // echo $array . "<br>";
-
-        // $fp = fopen($url, 'a+') or die("Nao foi possivel abrir o arquivo!");
-        // fwrite($fp, $array);
-        // fclose($fp);
 
         return $bankAccount;
     }
@@ -70,15 +50,26 @@ class BankAccountController
     public function showAccount($accountNumber)
     {
         try {
-            $sql = "SELECT * FROM account WHERE accountnumber = '$accountNumber'";
-            $aws = $this->pdo->prepare($sql);
-            if ($aws->execute()) {
-                while ($rs = $aws->fetch(PDO::FETCH_OBJ)) {
-                    echo $rs->accountnumber . $rs->name . $rs->type
-                        . $rs->balance . $rs->isopen;
+            $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->execute();
+            $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
+            if ($aws) {
+                echo "Nome do cliente: " . $aws['name'] . "<br>";
+                if ($aws['type'] === "CC") {
+                    echo "Tipo de conta: Conta Corrente<br>";
+                } else {
+                    echo "Tipo de conta: Conta Poupança<br>";
+                }
+                echo "Saldo: R$" . $aws['balance'] . "<br>";
+                if ($aws['isopen']) {
+                    echo "Status: Ativo<br>";
+                } else {
+                    echo "Status: Inativo<br>";
                 }
             } else {
-                echo "Erro: Não foi possível recuperar os dados do banco de dados";
+                echo "Erro: Não foi possível acessar os dados do banco de dados";
             }
         } catch (PDOException $e) {
             echo $sql . "<br>" . $e;

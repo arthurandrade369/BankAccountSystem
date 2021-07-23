@@ -2,8 +2,8 @@
 require_once("../../config/connection-db.php");
 require_once("../Controller/BankAccountController.php");
 
-if (!empty(trim($_POST['accountNumber'])) && isset($_REQUEST['send'])) {
-    $controller = new BankAccountController($pdo);
+if (!empty($_POST['accountNumber']) && isset($_REQUEST['send'])) {
+    $controller = new BankAccountController();
     $bank = $controller->showAccount($_POST['accountNumber']);
 }
 
