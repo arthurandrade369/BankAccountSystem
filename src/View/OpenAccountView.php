@@ -1,11 +1,11 @@
 <?php
-    require_once("../../config/connection-db.php");
-    require_once("../Controller/BankAccountController.php");
+require_once("../../config/connection-db.php");
+require_once("../Controller/BankAccountController.php");
 
-    if (!empty($_POST['name']) && !empty($_POST['type']) && isset($_REQUEST['send'])) {
-        $controller = new BankAccountController($pdo);
-        $bank = $controller->openAccount($_POST["name"], $_POST['type']);
-    }
+if (!empty($_POST['name']) && !empty($_POST['type']) && isset($_REQUEST['send'])) {
+    $controller = new BankAccountController();
+    $bank = $controller->openAccount($_POST["name"], $_POST['type']);
+}
 ?>
 <html>
 <title>Criação de conta</title>
@@ -16,7 +16,7 @@
         <input type="text" name="name"><br>
 
         <label for="type"> Tipo da conta:</label>
-        <select name="type">
+        <select name="type" aria_placeholder="Selecione o tipo de conta">
             <option></option>
             <option value="CC">Conta Corrente</option>
             <option value="CP">Conta Poupança</option>

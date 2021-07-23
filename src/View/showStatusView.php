@@ -1,10 +1,17 @@
 <?php
-    require_once("../../config/connection-db.php");
-    require_once("../Controller/BankAccountController.php");
+require_once("../../config/connection-db.php");
+require_once("../Controller/BankAccountController.php");
+
+if (!empty(trim($_POST['accountNumber'])) && isset($_REQUEST['send'])) {
+    $controller = new BankAccountController($pdo);
+    $bank = $controller->showAccount($_POST['accountNumber']);
+}
+
 ?>
 <html>
 
 <body>
+
     <form method="POST">
         <label>Numero da conta:</label>
         <input type="text" name="accountNumber"><br>
@@ -16,12 +23,6 @@
         <input type="submit" value="Voltar">
     </form>
 
-    <?php
-    if (!empty(trim($_POST['accountNumber'])) && isset($_REQUEST['send'])) {
-        $controller = new BankAccountController($pdo);
-        $bank = $controller->showAccount($_POST['accountNumber']);
-    }
-    ?>
 
 </body>
 

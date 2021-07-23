@@ -4,12 +4,12 @@ require_once("../../config/connection-db.php");
 
 class BankAccountController
 {
-    private $pdo;
+    // private $pdo;
 
-    public function __construct($pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    // public function __construct($pdo)
+    // {
+    //     $this->pdo = $pdo;
+    // }
     public function openAccount($name, $type)
     {
         if (empty($name) || empty($type)) return;
@@ -29,8 +29,14 @@ class BankAccountController
         $isOpen = $bankAccount->getIsOpen();
 
         try {
-            $sql = "INSERT INTO account VALUES (DEFAULT, '$name', '$type', '$balance', '$isOpen')";
-            $this->pdo->exec($sql);
+            $sql = "INSERT INTO account (name,type,balance,isopen) VALUES ('$name', '$type','$balance', '$isOpen')";
+            $p_sql = Connection::getInstance();
+            $p_sql->exec($sql);
+            // $p_sql->bindValue(":name", $name);
+            // $p_sql->bindValue(":type", $type);
+            // $p_sql->bindValue(":balance", $balance);
+            // $p_sql->bindValue(":isOpen", $isOpen);
+
             echo "Cadastrado com successo!";
         } catch (PDOException $e) {
             echo $sql . "<br>" . $e;
@@ -69,7 +75,7 @@ class BankAccountController
             if ($aws->execute()) {
                 while ($rs = $aws->fetch(PDO::FETCH_OBJ)) {
                     echo $rs->accountnumber . $rs->name . $rs->type
-                        .$rs->balance . $rs->isopen;
+                        . $rs->balance . $rs->isopen;
                 }
             } else {
                 echo "Erro: Não foi possível recuperar os dados do banco de dados";
