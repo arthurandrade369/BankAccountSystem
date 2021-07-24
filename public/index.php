@@ -14,6 +14,14 @@
         <input type="submit" value="Mostrar Conta">
     </form>
 
+    <form action="../src/View/cashDepositView.php">
+        <input type="submit" value="Depositar">
+    </form>
+
+    <form action="../src/View/cashWithdrawView.php">
+        <input type="submit" value="Saque">
+    </form>
+
 </body>
 
 </html>

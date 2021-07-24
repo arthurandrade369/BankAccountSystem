@@ -78,22 +78,42 @@ class BankAccountController
 
     public function cashDeposit($accountNumber, $value)
     {
-        // if ($bankAccount->getIsOpen()) {
-        //     if (empty($value)) return;
-        //     return $bankAccount->setBalance($bankAccount->getBalance() + $value);
-        // } else {
-        //     echo "Conta Inativa!";
-        // }
+        try {
+            $sql = "UPDATE account SET balance = balance + :value WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":value", $value);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->execute();
+            echo "Deposito realizado com sucesso!";
+        } catch (PDOException $e) {
+            echo $sql . "<br>" . $e;
+        }
     }
 
-    public function casWithdraw($bankAccount, $value)
+    public function casWithdraw($accountNumber, $value)
     {
-        if ($bankAccount->getIsOpen()) {
-            if ($value > $bankAccount->getBalance()) {
+        try {
+            $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->execute();
+            $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo $sql . "<br>" . $e;
+        }
+        if ($aws['balance'] > $value) {
+            if ($value > $aws['balance']) {
                 echo "Saldo insuficiente!";
-                return;
             } else {
-                return $bankAccount->setBalance($bankAccount->getBalance() - $value);
+                try {
+                    $sql = "UPDATE account SET balance = balance - :value WHERE accountnumber = :account LIMIT 1";
+                    $p_sql = Connection::getInstance()->prepare($sql);
+                    $p_sql->bindValue(":value", $value);
+                    $p_sql->bindValue(":account", $accountNumber);
+                    $p_sql->execute();
+                    echo "Saque realizado com sucesso!";
+                } catch (PDOException $e) {
+                    echo $sql . "<br>" . $e;
+                }
             }
         } else {
             echo "Conta Inativa!";
