@@ -4,7 +4,7 @@ require_once("../Controller/BankAccountController.php");
 
 if (!empty($_POST['accountNumber']) && !empty($_POST['value']) && isset($_REQUEST['send'])) {
     $controller = new BankAccountController();
-    $controller->casWithdraw($_POST['accountNumber'],$_POST['value']);
+    $controller->cashWithdraw($_POST['accountNumber'],$_POST['value']);
 }
 
 ?>

@@ -21,6 +21,14 @@
     <form action="../src/View/cashWithdrawView.php">
         <input type="submit" value="Saque">
     </form>
+    
+    <form action="../src/View/montlyPaymentView.php">
+        <input type="submit" value="Pagar Mensalidade">
+    </form>
+
+    <form action="../src/View/closeAccountView.php">
+        <input type="submit" value="Fechar Conta">
+    </form>
 
 </body>
 

@@ -72,7 +72,7 @@ class BankAccountController
                 echo "Erro: Não foi possível acessar os dados do banco de dados";
             }
         } catch (PDOException $e) {
-            echo $sql . "<br>" . $e;
+            die($sql . "<br>" . $e);
         }
     }
 
@@ -86,21 +86,22 @@ class BankAccountController
             $p_sql->execute();
             echo "Deposito realizado com sucesso!";
         } catch (PDOException $e) {
-            echo $sql . "<br>" . $e;
+            die($sql . "<br>" . $e);
         }
     }
 
-    public function casWithdraw($accountNumber, $value)
+    public function cashWithdraw($accountNumber, $value)
     {
         try {
             $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
             $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
             $p_sql->execute();
             $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            echo $sql . "<br>" . $e;
+            die($sql . "<br>" . $e);
         }
-        if ($aws['balance'] > $value) {
+        if ($aws['isopen']) {
             if ($value > $aws['balance']) {
                 echo "Saldo insuficiente!";
             } else {
@@ -120,14 +121,64 @@ class BankAccountController
         }
     }
 
-    public function montlyPayment($bankAccount)
+    public function montlyPayment($accountNumber)
     {
-        if ($bankAccount->getType() == "CC") {
-            $bankAccount->setBalance();
+        try {
+            $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->execute();
+            $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die($sql . "<br>" . $e);
+        }
+        if ($aws['isopen']) {
+            if ($aws['type'] === "CC") {
+                try {
+                    $sql = "UPDATE account SET balance = balance - 12 WHERE accountnumber = :account LIMIT 1";
+                    $p_sql = Connection::getInstance()->prepare($sql);
+                    $p_sql->bindValue(":account", $accountNumber);
+                    $p_sql->execute();
+                    echo "Pagamento realizado com sucesso";
+                } catch (PDOException $e) {
+                    die($sql . "<br>" . $e);
+                }
+            } else {
+                try {
+                    $sql = "UPDATE account SET balance = balance - 20 WHERE accountnumber = :account LIMIT 1";
+                    $p_sql = Connection::getInstance()->prepare($sql);
+                    $p_sql->bindValue(":account", $accountNumber);
+                    $p_sql->execute();
+                    echo "Pagamento realizado com sucesso";
+                } catch (PDOException $e) {
+                    die($sql . "<br>" . $e);
+                }
+            }
+        } else {
+            echo "Conta Inativa!";
         }
     }
 
-    public function closeAccount()
+    public function closeAccount($accountNumber)
     {
+        try {
+            $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->execute();
+            $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die($sql . "<br>" . $e);
+        }
+        if ($aws['balance'] > 0) {
+            echo "Impossivel fechar conta! <br> Ainda possui saldo.";
+        } elseif ($aws['balance'] < 0) {
+            echo "Impossivel fechar conta! <br> Ainda resta pendencia na conta.";
+        } else {
+            $sql = "UPDATE account SET isopen = 0 WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->execute();
+        }
     }
 }
