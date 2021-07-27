@@ -43,8 +43,6 @@ class BankAccountController
         } catch (PDOException $e) {
             echo $sql . "<br>" . $e;
         }
-
-        return $bankAccount;
     }
 
     public function showAccount($accountNumber)
@@ -69,24 +67,37 @@ class BankAccountController
                     echo "Status: Inativo<br>";
                 }
             } else {
-                echo "Erro: Não foi possível acessar os dados do banco de dados";
+                echo "Erro: Conta inexistente.";
             }
         } catch (PDOException $e) {
-            die($sql . "<br>" . $e);
+            echo $sql . "<br>" . $e;
         }
     }
 
     public function cashDeposit($accountNumber, $value)
     {
         try {
-            $sql = "UPDATE account SET balance = balance + :value WHERE accountnumber = :account LIMIT 1";
+            $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
             $p_sql = Connection::getInstance()->prepare($sql);
-            $p_sql->bindValue(":value", $value);
             $p_sql->bindValue(":account", $accountNumber);
             $p_sql->execute();
-            echo "Deposito realizado com sucesso!";
+            $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             die($sql . "<br>" . $e);
+        }
+        if ($aws) {
+            try {
+                $sql = "UPDATE account SET balance = balance + :value WHERE accountnumber = :account LIMIT 1";
+                $p_sql = Connection::getInstance()->prepare($sql);
+                $p_sql->bindValue(":value", $value);
+                $p_sql->bindValue(":account", $accountNumber);
+                $p_sql->execute();
+                echo "Deposito realizado com sucesso!";
+            } catch (PDOException $e) {
+                echo $sql . "<br>" . $e;
+            }
+        } else {
+            echo "Error: Conta não existe";
         }
     }
 
@@ -99,7 +110,7 @@ class BankAccountController
             $p_sql->execute();
             $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            die($sql . "<br>" . $e);
+            echo $sql . "<br>" . $e;
         }
         if ($aws['isopen']) {
             if ($value > $aws['balance']) {
@@ -130,32 +141,35 @@ class BankAccountController
             $p_sql->execute();
             $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            die($sql . "<br>" . $e);
+            echo $sql . "<br>" . $e;
         }
-        if ($aws['isopen']) {
-            if ($aws['type'] === "CC") {
+        if ($aws) {
+            if ($aws['isopen']) {
+                switch ($aws['type']) {
+                    case 'CC':
+                        $balance = 12;
+                        break;
+                    case 'CP':
+                        $balance = 20;
+                        break;
+                    default:
+                        return "Tipo de conta invalida!";
+                        break;
+                }
                 try {
-                    $sql = "UPDATE account SET balance = balance - 12 WHERE accountnumber = :account LIMIT 1";
+                    $sql = "UPDATE account SET balance = balance - $balance WHERE accountnumber = :account LIMIT 1";
                     $p_sql = Connection::getInstance()->prepare($sql);
                     $p_sql->bindValue(":account", $accountNumber);
                     $p_sql->execute();
                     echo "Pagamento realizado com sucesso";
                 } catch (PDOException $e) {
-                    die($sql . "<br>" . $e);
+                    echo $sql . "<br>" . $e;
                 }
             } else {
-                try {
-                    $sql = "UPDATE account SET balance = balance - 20 WHERE accountnumber = :account LIMIT 1";
-                    $p_sql = Connection::getInstance()->prepare($sql);
-                    $p_sql->bindValue(":account", $accountNumber);
-                    $p_sql->execute();
-                    echo "Pagamento realizado com sucesso";
-                } catch (PDOException $e) {
-                    die($sql . "<br>" . $e);
-                }
+                return "Conta Inativa!";
             }
         } else {
-            echo "Conta Inativa!";
+            echo "Erro: Conta inexistente.";
         }
     }
 
@@ -168,17 +182,30 @@ class BankAccountController
             $p_sql->execute();
             $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            die($sql . "<br>" . $e);
+            echo $sql . "<br>" . $e;
         }
-        if ($aws['balance'] > 0) {
-            echo "Impossivel fechar conta! <br> Ainda possui saldo.";
-        } elseif ($aws['balance'] < 0) {
-            echo "Impossivel fechar conta! <br> Ainda resta pendencia na conta.";
+        if ($aws) {
+            if ($aws['balance'] > 0) {
+                echo "Impossivel fechar conta! <br> Ainda possui saldo.";
+            } elseif ($aws['balance'] < 0) {
+                echo "Impossivel fechar conta! <br> Ainda resta pendencia na conta.";
+            } else {
+                try {
+                    $sql = "UPDATE account SET isopen = 0 WHERE accountnumber = :account LIMIT 1";
+                    $p_sql = Connection::getInstance()->prepare($sql);
+                    $p_sql->bindValue(":account", $accountNumber);
+                    $p_sql->execute();
+                    echo "Conta fechada com sucesso!";
+                } catch (PDOException $e) {
+                    echo $sql . "<br>" . $e;
+                }
+            }
         } else {
-            $sql = "UPDATE account SET isopen = 0 WHERE accountnumber = :account LIMIT 1";
-            $p_sql = Connection::getInstance()->prepare($sql);
-            $p_sql->bindValue(":account", $accountNumber);
-            $p_sql->execute();
+            echo "Error: Conta não existe";
         }
+    }
+
+    public function reOpenAccount($accountNumber)
+    {
     }
 }

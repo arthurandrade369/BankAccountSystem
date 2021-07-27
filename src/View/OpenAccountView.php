@@ -4,7 +4,7 @@ require_once("../Controller/BankAccountController.php");
 
 if (!empty($_POST['name']) && !empty($_POST['type']) && isset($_REQUEST['send'])) {
     $controller = new BankAccountController();
-    $bank = $controller->openAccount($_POST["name"], $_POST['type']);
+    $controller->openAccount($_POST["name"], $_POST['type']);
 }
 ?>
 <html>

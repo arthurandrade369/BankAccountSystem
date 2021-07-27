@@ -68,9 +68,4 @@ class BankAccount
         $this->isOpen = $isOpen;
         return $this;
     }
-
-    public function showStatus($bankaccount)
-    {
-        
-    }
 }
