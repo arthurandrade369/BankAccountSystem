@@ -30,6 +30,10 @@
         <input type="submit" value="Fechar Conta">
     </form>
 
+    <form action="../src/View/reOpenAccountView.php">
+        <input type="submit" value="Reabrir Conta">
+    </form>
+
 </body>
 
 </html>

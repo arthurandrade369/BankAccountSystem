@@ -43,6 +43,7 @@ class BankAccountController
         } catch (PDOException $e) {
             echo $sql . "<br>" . $e;
         }
+        self::showAccount($bankAccount);
     }
 
     public function showAccount($accountNumber)
@@ -92,10 +93,11 @@ class BankAccountController
                 $p_sql->bindValue(":value", $value);
                 $p_sql->bindValue(":account", $accountNumber);
                 $p_sql->execute();
-                echo "Deposito realizado com sucesso!";
+                echo "Deposito realizado com sucesso!<br>";
             } catch (PDOException $e) {
                 echo $sql . "<br>" . $e;
             }
+            self::showAccount($accountNumber);
         } else {
             echo "Error: Conta não existe";
         }
@@ -122,10 +124,11 @@ class BankAccountController
                     $p_sql->bindValue(":value", $value);
                     $p_sql->bindValue(":account", $accountNumber);
                     $p_sql->execute();
-                    echo "Saque realizado com sucesso!";
+                    echo "Saque realizado com sucesso!<br>";
                 } catch (PDOException $e) {
                     echo $sql . "<br>" . $e;
                 }
+                self::showAccount($accountNumber);
             }
         } else {
             echo "Conta Inativa!";
@@ -161,10 +164,11 @@ class BankAccountController
                     $p_sql = Connection::getInstance()->prepare($sql);
                     $p_sql->bindValue(":account", $accountNumber);
                     $p_sql->execute();
-                    echo "Pagamento realizado com sucesso";
+                    echo "Pagamento realizado com sucesso<br>";
                 } catch (PDOException $e) {
                     echo $sql . "<br>" . $e;
                 }
+                self::showAccount($accountNumber);
             } else {
                 return "Conta Inativa!";
             }
@@ -195,10 +199,11 @@ class BankAccountController
                     $p_sql = Connection::getInstance()->prepare($sql);
                     $p_sql->bindValue(":account", $accountNumber);
                     $p_sql->execute();
-                    echo "Conta fechada com sucesso!";
+                    echo "Situação alterada para Inativa!<br>";
                 } catch (PDOException $e) {
                     echo $sql . "<br>" . $e;
                 }
+                self::showAccount($accountNumber);
             }
         } else {
             echo "Error: Conta não existe";
@@ -207,5 +212,28 @@ class BankAccountController
 
     public function reOpenAccount($accountNumber)
     {
+        try {
+            $sql = "SELECT * FROM account WHERE accountnumber = :account LIMIT 1";
+            $p_sql = Connection::getInstance()->prepare($sql);
+            $p_sql->bindValue(":account", $accountNumber);
+            $p_sql->execute();
+            $aws = $p_sql->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo $sql . "<br>" . $e;
+        }
+        if (!$aws['isopen']) {
+            try {
+                $sql = "UPDATE account SET isopen = 1 WHERE accountnumber = :account LIMIT 1";
+                $p_sql = Connection::getInstance()->prepare($sql);
+                $p_sql->bindValue(":account", $accountNumber);
+                $p_sql->execute();
+                echo "Situação alterada para Ativa!<br>";
+            } catch (PDOException $e) {
+                echo $sql . "<br>" . $e;
+            }
+            self::showAccount($accountNumber);
+        } else {
+            echo "Conta já está ativa!";
+        }
     }
 }
